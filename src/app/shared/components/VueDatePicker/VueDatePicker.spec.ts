@@ -1,8 +1,11 @@
 import { createLocalVue, mount } from '@vue/test-utils';
 import VueDatePicker from './VueDatePicker.vue';
 import { i18n } from '../../plugins/i18n/i18n';
+import VueCompositionApi from "@vue/composition-api";
 
 const localVue = createLocalVue();
+
+localVue.use(VueCompositionApi);
 
 describe('VueDatePicker.vue', () => {
   const defaultProps = {

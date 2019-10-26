@@ -63,7 +63,6 @@
 
 <script lang="ts">
 import debounce from 'lodash/debounce';
-import { getGUID } from '@vuesion/utils/dist/randomGenerator';
 import { IAutocompleteOption } from './IAutocompleteOption';
 import VueInput from '../VueInput/VueInput.vue';
 import VueLoader from '../VueLoader/VueLoader.vue';

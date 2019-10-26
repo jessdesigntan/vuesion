@@ -7,99 +7,36 @@
 </template>
 
 <script lang="ts">
-import anime from 'animejs';
+import { createComponent, ref } from '@vue/composition-api';
+import { useOutsideClickBehaviour } from '@shared/composables/use-outside-click-behaviour';
+import { useKeyDownBehavior } from '@shared/composables/use-keydown-behaviour';
+import { useBackdrop } from '@shared/composables/use-backdrop';
 
-export default {
+export default createComponent({
   name: 'VueModal',
   props: {
-    show: {
-      type: Boolean,
-    },
-    fitContent: {
-      type: Boolean,
-    },
+    show: Boolean,
+    fitContent: Boolean,
   },
-  methods: {
-    beforeEnter(el: HTMLElement) {
-      el.style.opacity = '0';
+  setup(props, { emit }) {
+    const modal = ref(null);
+    const { onOutsideClick } = useOutsideClickBehaviour(modal);
+    const { onKeyDown } = useKeyDownBehavior();
+    const onClose = () => emit('close');
 
-      document.getElementById('overlay').style.visibility = 'visible';
-    },
-    enter(el: HTMLElement, done: any) {
-      document.getElementById('overlay').style.opacity = '0.5';
-      document.body.style.overflow = 'hidden';
-
-      anime({
-        targets: el,
-        opacity: {
-          value: '1',
-          duration: 500,
-          elasticity: 0,
-        },
-        complete: done,
-      });
-    },
-    beforeLeave(el: HTMLElement) {
-      el.style.opacity = '1';
-    },
-    leave(el: HTMLElement, done: any) {
-      const overlay: HTMLElement = document.getElementById('overlay');
-      overlay.style.opacity = '0';
-      document.body.style.overflow = 'initial';
-
-      anime({
-        targets: el,
-        opacity: {
-          value: '0',
-          duration: 500,
-          elasticity: 0,
-        },
-        complete() {
-          overlay.style.visibility = 'hidden';
-          done();
-        },
-      });
-    },
-    handleDocumentClick(e: Event) {
-      if (this.$refs.modal && this.$refs.modal.contains(e.target) === false) {
-        this.$emit('close');
+    onOutsideClick(() => onClose());
+    onKeyDown((e) => {
+      if (e.key === 'Escape' && props.show === true) {
+        onClose();
       }
-    },
-    handleDocumentKeyDown(e: KeyboardEvent) {
-      if (e.key === 'Escape') {
-        this.$emit('close');
-      }
-    },
-  },
-  beforeMount() {
-    let overlay: HTMLElement = document.getElementById('overlay');
+    });
 
-    if (overlay === null) {
-      overlay = document.createElement('div');
-      overlay.id = 'overlay';
-      overlay.style.position = 'fixed';
-      overlay.style.top = '0';
-      overlay.style.left = '0';
-      overlay.style.width = '100%';
-      overlay.style.height = '100%';
-      overlay.style.zIndex = '2000';
-      overlay.style.background = 'var(--brand-bg-color-variant)';
-      overlay.style.opacity = '0';
-      overlay.style.visibility = 'hidden';
-      overlay.style.transition = 'opacity 250ms linear';
-      document.body.appendChild(overlay);
-    }
-
-    document.addEventListener('mousedown', this.handleDocumentClick);
-    document.addEventListener('touchstart', this.handleDocumentClick);
-    document.addEventListener('keydown', this.handleDocumentKeyDown);
+    return {
+      modal,
+      ...useBackdrop(),
+    };
   },
-  beforeDestroy() {
-    document.removeEventListener('mousedown', this.handleDocumentClick);
-    document.removeEventListener('touchstart', this.handleDocumentClick);
-    document.removeEventListener('keydown', this.handleDocumentKeyDown);
-  },
-};
+});
 </script>
 
 <style lang="scss" module>
