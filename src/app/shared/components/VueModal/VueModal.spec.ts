@@ -44,7 +44,7 @@ describe('VueModal.vue', () => {
     expect(document.removeEventListener).toHaveBeenCalledTimes(3);
   });
 
-  xtest('should close on outside click', () => {
+  test('should close on outside click', async () => {
     const map: any = {};
     document.addEventListener = jest.fn((event, cb) => {
       map[event] = cb;
@@ -62,12 +62,9 @@ describe('VueModal.vue', () => {
 
     wrapper.vm.$emit = jest.fn();
 
-    wrapper.setData({ modal: wrapper.find(`div`).element });-
+    await wrapper.vm.$nextTick();
 
     map.mousedown({ target: paragraph });
-    expect(wrapper.vm.$emit).toHaveBeenCalledTimes(0);
-
-    map.mousedown({ target: null });
     expect(wrapper.vm.$emit).toHaveBeenCalledTimes(0);
 
     map.mousedown({ target: null });
